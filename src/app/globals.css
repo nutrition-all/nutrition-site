@@ -1,3 +1,4 @@
+/* Base e componentes do Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -15,7 +16,116 @@
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  padding: 20px;
+}
+
+h2 {
+  color: #333;
+}
+
+select, button {
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+select {
+  width: 200px;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+  border: none;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Configurações de layout flexível para o App */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Adicione scroll e ajuste para seções longas */
+.total-nutrition {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  max-height: 600px; /* Limita a altura e permite rolagem */
+  overflow-y: auto; /* Adiciona barra de rolagem vertical */
+}
+
+.total-nutrition .column {
+  flex: 1; /* Divide em colunas */
+  min-width: 300px;
+}
+
+/* Estilização das barras nutricionais */
+.nutrient-bar {
+  margin: 10px 0;
+  position: relative;
+}
+
+.bar-container {
+  position: relative;
+  width: 100%;
+  height: 6px; /* Ajuste para barra mais fina */
+  background-color: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.bar-excess {
+  height: 100%;
+  position: absolute;
+  left: 100%;
+  transition: width 0.3s ease;
+  background-color: red;
+}
+
+.bar-values {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 5px;
+  font-size: 12px;
+  margin-top: 4px;
+  color: #333;
+}
+
+.marker {
+  position: absolute;
+  top: 0;
+  height: 10px;
+  width: 2px;
+  background-color: blue;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.bar-current {
+  position: absolute;
+  top: -15px; /* Ajuste para exibir acima */
+  transform: translateX(-50%);
+  background-color: white;
+  padding: 0 3px;
+  font-size: 11px;
+  color: #333;
 }

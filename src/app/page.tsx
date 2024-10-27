@@ -1,101 +1,141 @@
-import Image from "next/image";
+"use client";
+import Papa from "papaparse";
+import { useEffect, useState } from "react";
+import { Food, SelectedFood } from "./FoodList";
+import FoodSelect from "./FoodSelect";
+import SelectedFoods from "./SelectedFoods";
+import TotalNutrition from "./TotalNutrition";
 
-export default function Home() {
+const convertTrToNull = (value: string) =>
+  value === "Tr" ? null : parseFloat(value);
+
+const App: React.FC = () => {
+  const [selectedFoods, setSelectedFoods] = useState<SelectedFood[]>([]);
+  const [foods, setFoods] = useState<Food[]>([]);
+
+  useEffect(() => {
+    const loadCSV = async () => {
+      const response = await fetch("./taco_consolidado.csv");
+      const reader = response.body?.getReader();
+      const result = await reader?.read();
+      const decoder = new TextDecoder("utf-8");
+      const csvData = decoder.decode(result?.value);
+
+      Papa.parse(csvData, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results: any) => {
+          const data = results.data as any[];
+          const formattedFoods: Food[] = data.map((item) => ({
+            id: parseInt(item.ID),
+            name: item.Alimento,
+            moisture: convertTrToNull(item["Umidade (%)"]),
+            calories: convertTrToNull(item["Energia (kcal)"]),
+            protein: convertTrToNull(item["Proteína (g)"]),
+            fat: convertTrToNull(item["Lipídeos (g)"]),
+            cholesterol: convertTrToNull(item["Colesterol (mg)"]),
+            carbs: convertTrToNull(item["Carboidrato (g)"]),
+            fiber: convertTrToNull(item["Alimentar (g)"]),
+            ashes: convertTrToNull(item["Cinzas (g)"]),
+            calcium: convertTrToNull(item["Cálcio (mg)"]),
+            magnesium: convertTrToNull(item["Magnésio (mg)"]),
+            manganese: convertTrToNull(item["Manganês (mg)"]),
+            phosphorus: convertTrToNull(item["Fósforo (mg)"]),
+            iron: convertTrToNull(item["Ferro (mg)"]),
+            sodium: convertTrToNull(item["Sódio (mg)"]),
+            potassium: convertTrToNull(item["Potássio (mg)"]),
+            copper: convertTrToNull(item["Cobre (mg)"]),
+            zinc: convertTrToNull(item["Zinco (mg)"]),
+            retinol: convertTrToNull(item["Retinol (mcg)"]),
+            re: convertTrToNull(item["RE (mcg)"]),
+            rae: convertTrToNull(item["RAE (mcg)"]),
+            thiamine: convertTrToNull(item["Tiamina (mg)"]),
+            riboflavin: convertTrToNull(item["Riboflavina (mg)"]),
+            pyridoxine: convertTrToNull(item["Piridoxina (mg)"]),
+            niacin: convertTrToNull(item["Niacina (mg)"]),
+            vitaminC: convertTrToNull(item["C (mg)"]),
+            saturatedFat: convertTrToNull(item["Saturados (g)"]),
+            monounsaturatedFat: convertTrToNull(item["Monoinsaturados (g)"]),
+            polyunsaturatedFat: convertTrToNull(item["Poliinsaturados (g)"]),
+            fat12_0: convertTrToNull(item["12:0 (g)"]),
+            fat14_0: convertTrToNull(item["14:0 (g)"]),
+            fat16_0: convertTrToNull(item["16:0 (g)"]),
+            fat18_0: convertTrToNull(item["18:0 (g)"]),
+            fat20_0: convertTrToNull(item["20:0 (g)"]),
+            fat22_0: convertTrToNull(item["22:0 (g)"]),
+            fat24_0: convertTrToNull(item["24:0 (g)"]),
+            fat14_1: convertTrToNull(item["14:1 (g)"]),
+            fat16_1: convertTrToNull(item["16:1 (g)"]),
+            fat18_1: convertTrToNull(item["18:1 (g)"]),
+            fat20_1: convertTrToNull(item["20:1 (g)"]),
+            fat18_2n6: convertTrToNull(item["18:2 n-6 (g)"]),
+            fat18_3n3: convertTrToNull(item["18:3 n-3 (g)"]),
+            fat20_4: convertTrToNull(item["20:4 (g)"]),
+            fat20_5: convertTrToNull(item["20:5 (g)"]),
+            fat22_5: convertTrToNull(item["22:5 (g)"]),
+            fat22_6: convertTrToNull(item["22:6 (g)"]),
+            fat18_1t: convertTrToNull(item["18:1t (g)"]),
+            fat18_2t: convertTrToNull(item["18:2t (g)"]),
+            tryptophan: convertTrToNull(item["Triptofano (g)"]),
+            threonine: convertTrToNull(item["Treonina (g)"]),
+            isoleucine: convertTrToNull(item["Isoleucina (g)"]),
+            leucine: convertTrToNull(item["Leucina (g)"]),
+            lysine: convertTrToNull(item["Lisina (g)"]),
+            methionine: convertTrToNull(item["Metionina (g)"]),
+            cystine: convertTrToNull(item["Cistina (g)"]),
+            phenylalanine: convertTrToNull(item["Fenilalanina (g)"]),
+            tyrosine: convertTrToNull(item["Tirosina (g)"]),
+            valine: convertTrToNull(item["Valina (g)"]),
+            arginine: convertTrToNull(item["Arginina (g)"]),
+            histidine: convertTrToNull(item["Histidina (g)"]),
+            alanine: convertTrToNull(item["Alanina (g)"]),
+            asparticAcid: convertTrToNull(item["Ácido Aspártico (g)"]),
+            glutamicAcid: convertTrToNull(item["Ácido Glutâmico (g)"]),
+            glycine: convertTrToNull(item["Glicina (g)"]),
+            proline: convertTrToNull(item["Prolina (g)"]),
+            serine: convertTrToNull(item["Serina (g)"]),
+          }));
+          setFoods(formattedFoods);
+        },
+      });
+    };
+
+    loadCSV();
+  }, []);
+
+  const handleAddFood = (food: Food) => {
+    const exists = selectedFoods.find((f) => f.id === food.id);
+    if (!exists) {
+      setSelectedFoods([...selectedFoods, { ...food, quantity: 100 }]);
+    }
+  };
+
+  const handleUpdateQuantity = (id: number, quantity: number) => {
+    setSelectedFoods(
+      selectedFoods.map((f: any) => (f.id === id ? { ...f, quantity } : f))
+    );
+  };
+
+  const handleRemoveFood = (id: number) => {
+    setSelectedFoods(selectedFoods.filter((f) => f.id !== id));
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+    <div className="container mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
+      <div className="w-full lg:w-1/3 flex flex-col gap-4">
+        <FoodSelect foods={foods} onAdd={handleAddFood} />
+        <SelectedFoods
+          selectedFoods={selectedFoods}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemove={handleRemoveFood}
         />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <div className="w-full lg:w-2/3 overflow-auto">
+        <TotalNutrition selectedFoods={selectedFoods} />
+      </div>
     </div>
   );
-}
+};
+
+export default App;
