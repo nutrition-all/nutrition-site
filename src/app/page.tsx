@@ -2,9 +2,11 @@
 import Papa from "papaparse";
 import { useEffect, useState } from "react";
 import { Food, SelectedFood } from "./FoodList";
-import FoodSelect from "./FoodSelect";
 import SelectedFoods from "./SelectedFoods";
 import TotalNutrition from "./TotalNutrition";
+import { nutrientProfiles } from "./NutrientBar";
+import FoodSelect from "./FoodSelect";
+import Link from "next/link";
 
 const convertTrToNull = (value: string) =>
   value === "Tr" ? null : parseFloat(value);
@@ -12,6 +14,8 @@ const convertTrToNull = (value: string) =>
 const App: React.FC = () => {
   const [selectedFoods, setSelectedFoods] = useState<SelectedFood[]>([]);
   const [foods, setFoods] = useState<Food[]>([]);
+  const [nutrientRanges, setNutrientRanges] = useState(nutrientProfiles.default);
+  const [selectedProfile, setSelectedProfile] = useState("default");
 
   useEffect(() => {
     const loadCSV = async () => {
@@ -103,12 +107,12 @@ const App: React.FC = () => {
     loadCSV();
   }, []);
 
-  const handleAddFood = (food: Food) => {
-    const exists = selectedFoods.find((f) => f.id === food.id);
-    if (!exists) {
-      setSelectedFoods([...selectedFoods, { ...food, quantity: 100 }]);
-    }
-  };
+  // const handleAddFood = (food: Food) => {
+  //   const exists = selectedFoods.find((f) => f.id === food.id);
+  //   if (!exists) {
+  //     setSelectedFoods([...selectedFoods, { ...food, quantity: 100 }]);
+  //   }
+  // };
 
   const handleUpdateQuantity = (id: number, quantity: number) => {
     setSelectedFoods(
@@ -116,23 +120,50 @@ const App: React.FC = () => {
     );
   };
 
-  const handleRemoveFood = (id: number) => {
-    setSelectedFoods(selectedFoods.filter((f) => f.id !== id));
+  const handleAddFood = (food: Food) => {
+    const exists = selectedFoods.find((f) => f.id === food.id);
+    if (!exists) {
+      setSelectedFoods([...selectedFoods, { ...food, quantity: 100 }]);
+    }
+  };
+
+  const handleProfileChange = (profileKey: string) => {
+    setSelectedProfile(profileKey);
+    setNutrientRanges(nutrientProfiles[profileKey]);
+    setSelectedFoods((prevFoods) => [...prevFoods]);
   };
 
   return (
     <div className="container mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
-      <div className="w-full lg:w-1/3 flex flex-col gap-4">
+      <div className="w-full lg:w-1/3 flex flex-col gap-4 p-4 bg-gray-50 rounded-lg shadow-lg">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-700">Seleção de Alimentos</h2>
+          {/* <Link href="/profiles" className="text-blue-500 hover:underline">
+            Gerenciar Perfis
+          </Link> */}
+          <select
+            value={selectedProfile}
+            onChange={(e) => handleProfileChange(e.target.value)}
+            className="border border-gray-300 rounded p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="default">Padrão</option>
+            <option value="protein">Alta Proteína</option>
+          </select>
+        </div>
         <FoodSelect foods={foods} onAdd={handleAddFood} />
         <SelectedFoods
           selectedFoods={selectedFoods}
-          onUpdateQuantity={handleUpdateQuantity}
-          onRemove={handleRemoveFood}
+          onUpdateQuantity={(id, quantity) =>
+            setSelectedFoods(
+              selectedFoods.map((f) => (f.id === id ? { ...f, quantity } : f))
+            )
+          }
+          onRemove={(id) => setSelectedFoods(selectedFoods.filter((f) => f.id !== id))}
         />
       </div>
-
-      <div className="w-full lg:w-2/3 overflow-auto">
-        <TotalNutrition selectedFoods={selectedFoods} />
+      <div className="w-full lg:w-2/3 p-4 bg-gray-50 rounded-lg shadow-lg overflow-auto">
+        <h2 className="text-lg font-semibold text-gray-700">Resumo Nutricional</h2>
+        <TotalNutrition key={selectedProfile} selectedFoods={selectedFoods} nutrientRanges={nutrientRanges} />
       </div>
     </div>
   );

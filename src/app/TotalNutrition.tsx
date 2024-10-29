@@ -1,5 +1,5 @@
-import { SelectedFood } from "./FoodList";
-import NutrientBar, { nutrientRanges } from "./NutrientBar";
+import { NutrientRanges, SelectedFood } from "./FoodList";
+import NutrientBar from "./NutrientBar";
 
 const calculateTotalNutrition = (selectedFoods: SelectedFood[]) => {
   const total: Record<keyof Omit<SelectedFood, "id" | "name">, number> = {
@@ -86,23 +86,26 @@ const calculateTotalNutrition = (selectedFoods: SelectedFood[]) => {
 
 interface TotalNutritionProps {
   selectedFoods: SelectedFood[];
+  nutrientRanges: NutrientRanges;
 }
 
-const TotalNutrition: React.FC<TotalNutritionProps> = ({ selectedFoods }) => {
+const TotalNutrition: React.FC<TotalNutritionProps> = ({ selectedFoods, nutrientRanges  }) => {
   const total = calculateTotalNutrition(selectedFoods);
 
   return (
-    <div>
-      <h2>Resumo Nutricional</h2>
-      {Object.entries(nutrientRanges).map(([key, { min, max }]) => (
-        <NutrientBar
-          key={key}
-          name={key.charAt(0).toUpperCase() + key.slice(1)}
-          value={total[key as keyof typeof total] || 0}
-          min={min}
-          max={max}
-        />
-      ))}
+    <div className="p-4 bg-gray-50 rounded-lg shadow-lg max-w-full mx-auto">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Resumo Nutricional</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Object.entries(nutrientRanges).map(([key, { min, max }]) => (
+          <NutrientBar
+            key={key}
+            name={key.charAt(0).toUpperCase() + key.slice(1)}
+            value={total[key as keyof typeof total] || 0}
+            min={min}
+            max={max}
+          />
+        ))}
+      </div>
     </div>
   );
 };
