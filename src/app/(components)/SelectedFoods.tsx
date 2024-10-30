@@ -1,5 +1,5 @@
 import React from "react";
-import { SelectedFood } from "./FoodList";
+import { SelectedFood } from "../(types)/TFood";
 
 interface SelectedFoodsProps {
   selectedFoods: SelectedFood[];

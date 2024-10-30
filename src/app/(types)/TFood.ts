@@ -70,11 +70,3 @@ export interface Food {
   serine: number | null;
 }
 
-export type NutrientRange = {
-  min: number;
-  max: number;
-};
-
-export type NutrientRanges = {
-  [K in keyof Omit<SelectedFood, "id" | "name" | "quantity">]: NutrientRange;
-};

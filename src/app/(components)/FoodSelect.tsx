@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Food } from "./FoodList";
+import { Food } from "../(types)/TFood";
 
 interface FoodSelectProps {
   foods: Food[];
