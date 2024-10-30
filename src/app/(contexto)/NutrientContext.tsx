@@ -134,7 +134,7 @@ export const nutrientProfiles: Record<string, NutrientRanges> = {
       proline: { min: 0, max: 1 },
       serine: { min: 0, max: 1 },
     }
-  };
+};
 
 
 interface NutrientContextType {

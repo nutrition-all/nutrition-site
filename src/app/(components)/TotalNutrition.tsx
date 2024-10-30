@@ -1,4 +1,5 @@
 
+import { Box, Typography, Grid } from "@mui/material";
 import { SelectedFood } from "../(types)/TFood";
 import { NutrientRanges } from "../(types)/TNutrient";
 import NutrientBar from "./NutrientBar";
@@ -95,20 +96,19 @@ const TotalNutrition: React.FC<TotalNutritionProps> = ({ selectedFoods, nutrient
   const total = calculateTotalNutrition(selectedFoods);
 
   return (
-    <div className="p-4 bg-gray-50 rounded-lg shadow-lg max-w-full mx-auto">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Resumo Nutricional</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {nutrientRanges && Object.entries(nutrientRanges).map(([key, { min, max }]) => (
-        <NutrientBar
-          key={key}
-          name={key.charAt(0).toUpperCase() + key.slice(1)}
-          value={total[key as keyof typeof total] || 0}
-          min={min}
-          max={max}
-        />
-      ))}
-      </div>
-    </div>
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h6" fontWeight="bold" mb={2}>
+        Resumo Nutricional
+      </Typography>
+      <Grid container spacing={2}>
+        {nutrientRanges &&
+          Object.entries(nutrientRanges).map(([key, { min, max }]) => (
+            <Grid item xs={12} sm={6} md={4} key={key}>
+              <NutrientBar name={key} value={total[key as keyof typeof total] || 0} min={min} max={max} />
+            </Grid>
+          ))}
+      </Grid>
+    </Box>
   );
 };
 

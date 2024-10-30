@@ -3,10 +3,11 @@ import Papa from "papaparse";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { SelectedFood, Food } from "../(types)/TFood";
-import SelectedFoods from "../(components)/SelectedFoods";
-import TotalNutrition from "../(components)/TotalNutrition";
+import SelectedFoods from "./SelectedFoods";
+import TotalNutrition from "./TotalNutrition";
 import { useNutrientContext } from "../(contexto)/NutrientContext";
-import FoodSelect from "../(components)/FoodSelect";
+import FoodSelect from "./FoodSelect";
+import { Typography, Grid, Paper, Box, Select, MenuItem, Container } from "@mui/material";
 
 const convertTrToNull = (value: string) =>
   value === "Tr" ? null : parseFloat(value);
@@ -114,44 +115,34 @@ const ShowNutrients: React.FC = () => {
     }
   };
 
-  const handleProfileChange = (profileKey: string) => {
-    setSelectedProfile(profileKey);
-    setSelectedFoods((prevFoods) => [...prevFoods]);
-  };
-
-  return (
-      <div className="container mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
-        <div className="w-full lg:w-1/3 flex flex-col gap-4 p-4 bg-gray-50 rounded-lg shadow-lg">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-700">Seleção de Alimentos</h2>
-            <Link href="/profiles" className="text-blue-500 hover:underline">
-              Gerenciar Perfis
-            </Link>
-            <select
-              value={selectedProfile}
-              onChange={(e) => handleProfileChange(e.target.value)}
-              className="border border-gray-300 rounded p-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="default">Padrão</option>
-              <option value="protein">Alta Proteína</option>
-            </select>
-          </div>
-          <FoodSelect foods={foods} onAdd={handleAddFood} />
-          <SelectedFoods
-            selectedFoods={selectedFoods}
-            onUpdateQuantity={(id, quantity) =>
-              setSelectedFoods(
-                selectedFoods.map((f) => (f.id === id ? { ...f, quantity } : f))
-              )
-            }
-            onRemove={(id) => setSelectedFoods(selectedFoods.filter((f) => f.id !== id))}
-          />
-        </div>
-        <div className="w-full lg:w-2/3 p-4 bg-gray-50 rounded-lg shadow-lg overflow-auto">
-          <h2 className="text-lg font-semibold text-gray-700 pb-5">Resumo Nutricional</h2>
-          <TotalNutrition key={selectedProfile} selectedFoods={selectedFoods} nutrientRanges={profiles[selectedProfile]} />
-        </div>
-      </div>
+   return (
+    <Box>
+      <Typography variant="h4" fontWeight="bold" textAlign="center" mb={4}>
+        Gerenciamento de Nutrientes
+      </Typography>
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={4}>
+          <Paper elevation={3} sx={{ padding: 3, height: "100%" }}>
+            <Typography variant="h6" mb={2}>
+              Seleção de Alimentos
+            </Typography>
+            <FoodSelect foods={foods} onAdd={handleAddFood} />
+            <SelectedFoods
+              selectedFoods={selectedFoods}
+              onUpdateQuantity={(id, quantity) =>
+                setSelectedFoods((prevFoods) => prevFoods.map((f) => (f.id === id ? { ...f, quantity } : f)))
+              }
+              onRemove={(id) => setSelectedFoods((prevFoods) => prevFoods.filter((f) => f.id !== id))}
+            />
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={8}>
+          <Paper elevation={3} sx={{ padding: 3 }}>
+            <TotalNutrition selectedFoods={selectedFoods} nutrientRanges={profiles[selectedProfile]} />
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

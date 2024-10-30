@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { NutrientRange, NutrientRanges } from "../(types)/TNutrient";
 import { useNutrientContext } from "../(contexto)/NutrientContext";
 import { Profile } from "../(types)/TProfile";
+import { Button, Grid, Paper, TextField, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
 
 
 interface ProfileManagerProps {
@@ -44,77 +46,117 @@ const ProfileManager: React.FC<ProfileManagerProps> = () => {
     setIsEditing(true);
   };
 
-  if (!ranges) return <p>Carregando...</p>;
+  if (!ranges) return <Typography>Carregando...</Typography>;
 
   return (
-    <div className="p-4 bg-gray-100 rounded-lg shadow-lg max-w-2xl mx-auto">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">
+    <Box p={4} component={Paper} elevation={3} maxWidth="600px" mx="auto">
+      <Typography variant="h5" mb={2} fontWeight="bold">
         {isEditing ? "Editar Perfil" : "Criar Novo Perfil"}
-      </h2>
-      <input
-        type="text"
-        placeholder="Nome do Perfil"
+      </Typography>
+      
+      <TextField
+        label="Nome do Perfil"
         value={profileName}
         onChange={(e) => setProfileName(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded mb-4"
+        fullWidth
+        variant="outlined"
+        margin="normal"
       />
 
-      <div className="space-y-4">
+      <Box mb={2}>
         {Object.keys(ranges).map((nutrient) => (
-          <div key={nutrient} className="flex gap-4 items-center">
-            <span className="flex-1 capitalize text-gray-700 font-medium">{nutrient}</span>
-            <input
-              type="number"
-              placeholder="Min"
-              value={ranges[nutrient as keyof NutrientRanges]?.min || ""}
-              onChange={(e) =>
-                handleInputChange(nutrient as keyof NutrientRanges, "min", parseFloat(e.target.value))
-              }
-              className="p-2 border border-gray-300 rounded"
-            />
-            <input
-              type="number"
-              placeholder="Max"
-              value={ranges[nutrient as keyof NutrientRanges]?.max || ""}
-              onChange={(e) =>
-                handleInputChange(nutrient as keyof NutrientRanges, "max", parseFloat(e.target.value))
-              }
-              className="p-2 border border-gray-300 rounded"
-            />
-          </div>
+          <Grid container key={nutrient} alignItems="center" spacing={2} mb={1}>
+            <Grid item xs={4}>
+              <Typography variant="body2" fontWeight="medium">
+                {nutrient.charAt(0).toUpperCase() + nutrient.slice(1)}
+              </Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <TextField
+                type="number"
+                label="Min"
+                value={ranges[nutrient as keyof NutrientRanges]?.min || ""}
+                onChange={(e) =>
+                  handleInputChange(nutrient as keyof NutrientRanges, "min", parseFloat(e.target.value))
+                }
+                fullWidth
+                size="small"
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <TextField
+                type="number"
+                label="Max"
+                value={ranges[nutrient as keyof NutrientRanges]?.max || ""}
+                onChange={(e) =>
+                  handleInputChange(nutrient as keyof NutrientRanges, "max", parseFloat(e.target.value))
+                }
+                fullWidth
+                size="small"
+                variant="outlined"
+              />
+            </Grid>
+          </Grid>
         ))}
-      </div>
+      </Box>
 
-      <button
+      <Button
         onClick={handleSaveProfile}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        variant="contained"
+        color="primary"
+        fullWidth
+        sx={{ mt: 2 }}
       >
         {isEditing ? "Atualizar Perfil" : "Salvar Perfil"}
-      </button>
+      </Button>
 
-      <h3 className="mt-6 text-lg font-semibold text-gray-800">Perfis Salvos</h3>
-      <div className="mt-2 space-y-2">
-  {Object.keys(profiles).map((name) => (
-    <div key={name} className="flex justify-between items-center p-2 bg-white rounded shadow">
-      <span className="font-medium text-gray-700">{name}</span>
-      <div>
-        <button
-          onClick={() => handleEditProfile({ name, ranges: profiles[name] })}
-          className="px-3 py-1 bg-yellow-500 text-white rounded mr-2 hover:bg-yellow-600"
-        >
-          Editar
-        </button>
-        <button
-          onClick={() => deleteProfile(name)}
-          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-        >
-          Deletar
-        </button>
-      </div>
-    </div>
-  ))}
-</div>
-    </div>
+      <Typography variant="h6" mt={4} mb={2} fontWeight="bold">
+        Perfis Salvos
+      </Typography>
+      {Object.keys(profiles).length === 0 ? (
+        <Typography variant="body2" color="textSecondary">
+          Nenhum perfil salvo.
+        </Typography>
+      ) : (
+        <Box>
+          {Object.keys(profiles).map((name) => (
+            <Paper
+              key={name}
+              elevation={2}
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                p: 2,
+                mb: 1,
+              }}
+            >
+              <Typography fontWeight="medium">{name}</Typography>
+              <Box>
+                <Button
+                  onClick={() => handleEditProfile({ name, ranges: profiles[name] })}
+                  size="small"
+                  variant="contained"
+                  color="warning"
+                  sx={{ mr: 1 }}
+                >
+                  Editar
+                </Button>
+                <Button
+                  onClick={() => deleteProfile(name)}
+                  size="small"
+                  variant="contained"
+                  color="error"
+                >
+                  Deletar
+                </Button>
+              </Box>
+            </Paper>
+          ))}
+        </Box>
+      )}
+    </Box>
   );
 };
 
